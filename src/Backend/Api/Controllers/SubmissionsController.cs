@@ -1,11 +1,12 @@
 ﻿using Api.Authentication;
 using Application.Submissions.Contracts;
 using Application.Submissions.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api")]
-public class SubmissionsController : Controller
+public sealed class SubmissionsController : ControllerBase
 {
     private readonly ISubmissionsService _submissionsService;
 
@@ -13,6 +14,7 @@ public class SubmissionsController : Controller
     {
         _submissionsService = submissionsService;
     }
+    [Authorize]
 
     [HttpPost("assignments/{assignmentId}/submissions")]
     public async Task<IActionResult> CreateSubmission(
