@@ -1,12 +1,9 @@
-﻿using Api.Authentication;
-using Application.Submissions.Contracts;
+﻿using Application.Submissions.Contracts;
 using Application.Submissions.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 [ApiController]
-[Authorize]
 [Route("api")]
 public class SubmissionsController : Controller
 {
@@ -16,6 +13,7 @@ public class SubmissionsController : Controller
     {
         _submissionsService = submissionsService;
     }
+
     [HttpPost("assignments/{assignmentId}/submissions")]
     public async Task<IActionResult> CreateSubmission(
         Guid assignmentId,
@@ -25,12 +23,9 @@ public class SubmissionsController : Controller
         if (isStudent == false)
             return Forbid();
 
-        var userId = User.GetUserId();
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        if (userId == null)
-            return Unauthorized();
-
-        var result = await _submissionsService.CreateSubmission(assignmentId, (Guid)userId, request);
+        var result = await _submissionsService.CreateSubmission(assignmentId, userId, request);
 
         if (result.Status == SubmissionAccessStatus.NotFound)
             return NotFound();
